@@ -1,0 +1,22 @@
+const mongoose = require('mongoose')
+mongoose.Promise = require('bluebird')
+before((done) => {
+  mongoose.connect('mongodb://localhost/users_test', {useMongoClient: true})
+  mongoose.connection
+    .once('open', () => {
+      done()
+    })
+    .on('error', (error) => {
+      console.warn('Warning', error)
+    })
+})
+beforeEach((done) => {
+  const {users, comments, blogposts} = mongoose.connection.collections
+  users.drop(() => {
+    comments.drop(() => {
+      blogposts.drop(() => {
+        done()
+      })
+    })
+  })
+})
